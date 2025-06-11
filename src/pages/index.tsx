@@ -1,115 +1,98 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+'use client';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import { useState, useRef } from 'react';
+import Head from 'next/head';
+import Image from 'next/image';
+import IconButton from '@/components/atoms/IconButton';
+import InfoView from '@/components/molecules/InfoView';
+import Carousel from '@/components/molecules/Carousel';
+import Sidebar from '@/components/molecules/Sidebar';
+import Button from '@/components/atoms/Button';
+import { getData } from '@/services/getData';
+import { getImage } from '@/services/getImage';
+import hamburguerIcon from '@/../public/hamburguerIcon.svg';
+import arrowIcon from '@/../public/arrowIcon.svg';
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+interface HomeProps {
+  data: any;
+  images: { image: string }[];
+}
 
-export default function Home() {
+export default function Home({ data, images }: HomeProps) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const hamburgerBtnRef = useRef<HTMLButtonElement | null>(null);
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <>
+      <Head>
+        <title>Challenge Bidcom</title>
+        <meta
+          name="description"
+          content="Challenge para posición de dev frontend en Bidcom"
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <link rel="icon" href="/favicon.ico" />
+        {images[0] && <link rel="preload" as="image" href={images[0].image} />}
+      </Head>
+
+      <div className="relative min-h-screen flex flex-col">
+        <Sidebar isOpen={isSidebarOpen} />
+        <div className="absolute top-4 right-4 z-50">
+          <IconButton
+            ref={hamburgerBtnRef}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           >
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src={hamburguerIcon}
+              alt="Hamburger"
+              width={30}
+              height={30}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </IconButton>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className="flex flex-1 flex-col lg:flex-row items-center justify-center gap-8 p-6">
+          <div className="w-full lg:w-1/2 flex justify-center">
+            <InfoView data={data} />
+          </div>
+          <div className="w-full lg:w-1/2 flex justify-center">
+            <Carousel images={images} priorityIndex={0} />
+          </div>
+          <div className="w-full block lg:hidden">
+            <Button href={data.button.link}>{data.button.title}</Button>
+          </div>
+        </div>
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+          <IconButton>
+            <Image src={arrowIcon} alt="Arrow" width={30} height={30} />
+          </IconButton>
+        </div>
+      </div>
+    </>
   );
+}
+
+export async function getServerSideProps() {
+  try {
+    const [data, images] = await Promise.all([getData(), getImage()]);
+
+    const validImages = await Promise.all(
+      images.map(async (img: { image: string }) => {
+        try {
+          const res = await fetch(img.image, { method: 'HEAD' });
+          return res.ok ? img : null;
+        } catch {
+          return null;
+        }
+      })
+    );
+
+    return {
+      props: { data, images: validImages.filter(Boolean) },
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      props: { data: null, images: [] },
+    };
+  }
 }
